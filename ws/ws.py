@@ -1,9 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 from classes import ParseJson, LoginFailed
+from beauti import CostumePrint
 
 js = ParseJson('db.json')
-
+fw = CostumePrint()
 
 # Start a session
 session = requests.Session()
@@ -13,17 +14,17 @@ login_url = 'https://ucilnica.fmf.uni-lj.si/login/index.php'
 
 try:
     # Attempt to log in with only username and password
-    print("Trying to log in without tokens")
+    fw.print_info("Trying to log in with only username and password", False)
     response = session.post(login_url, data={'username': u, 'password': p})
-    print(response.status_code)
-    print(response.url)
+    fw.print_info(response.url, True, response.status_code)
     if response.url == login_url:
+        fw.print_info("Login failed", False, "Proceeding to login with tokens")
         raise LoginFailed
 
 except LoginFailed:
     # If previous login attempt failed, try again with tokens
     # Get the login page to retrieve any necessary tokens if needed
-    print("Trying to log in with tokens")
+    fw.print_info("Trying to log in with tokens", False)
     response = session.get(login_url)
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -35,25 +36,10 @@ except LoginFailed:
 
     # Attempt to log in
     response = session.post(login_url, data=login_payload)
-    print(response.status_code)
-    print(response.url)
+    fw.print_info(response.url, True, response.status_code)
 finally:
     if response.url != login_url:
-        print("Login successful")
+        fw.print_info("Login successful", False)
     else:
-        print("Login failed")
-
-
-# trgt_url = 'https://ucilnica.fmf.uni-lj.si/course/view.php?id=119'
-
-# response = session.get(trgt_url)
-# print(response.status_code)
-# print(response.url)
-# res_text = response.text
-# soup = BeautifulSoup(res_text, 'html.parser')
-
-# search_elem = soup.find_all('span', class_='instancename')
-# print(len(search_elem))
-# for elem in search_elem:
-#     if 'NALOGA' in elem.text:
-#         print(elem.text)
+        fw.print_info("Login failed", False, "Exiting program")
+        exit()
