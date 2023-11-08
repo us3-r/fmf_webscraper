@@ -46,13 +46,17 @@ class CostumePrint:
         action = avb_action[what]
         important_part = f"{important_data}" if important_data else None
         print(f"{prefix} [{action}] \t:: {info}") if important_part is None else print(
-            f"{prefix} [{action}] \t:: !! {important_part} !!\n{prefix} [{action}] \t:: {info}")
+            f"{prefix} [{action}] \t:: {info}\n{prefix} [{action}] \t:: |_ {important_part} _|")
         return
-    def get_info(self, info):
+
+    def get_info(self, info)->str:
         """prompts user for input
 
         Args:
             info (str): what we wish to print
+        Return:
+            input from user        
         """
         prefix = "..."
-        print(f"{prefix} [prompting] \t:: {info}\n")
+        cin = input(f"{prefix} [prompting] \t:: {info}\n")
+        return cin

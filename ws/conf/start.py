@@ -24,10 +24,10 @@ class Setup:
         if not os.path.exists(self.filename):
             with open(self.filename, 'w') as file:
                 json.dump(self.default_data, file, indent=4)
-            fw.print_info(f"'{self.filename}' created with default structure.", 2)
+            fw.info(f"'{self.filename}' created with default structure.", 2)
             return True
         else:
-            fw.print_info(f"'{self.filename}' already exists.", 2)
+            fw.info(f"'{self.filename}' already exists.", 2)
             return False
 
     # Example
@@ -35,11 +35,11 @@ class Setup:
     # setup.create_file()
 
 
-class Start:
+class Start_helper:
     def __init__(self) -> None:
         pass
     
-    def Chek(self)->bool:
+    def Chek()->bool:
         """Checks if db.json exists and its data is not DEFAULT
 
         Returns:
@@ -51,21 +51,20 @@ class Start:
             li = runner.read_login_info()
             return True if li[0] != '' and li[1] != '' else False
         except Exception as e:
-            fw.print_info(e, 2)
+            fw.info(e, 2)
             return False
-             
         
-    def Reset_login_info(self,file:object, user:str, pasword:str):
+    def Reset_login_info(file:object, user:str, password:str):
         """Resets users login info
 
         Args:
             user (str): username
             pasword (str): password
         """
-        file.write_login_info(user, pasword)
+        file.write_login_info(user, password)
         
     
-    def Args(self):
+    def Args():
         """Prompts user for login info if db.json does not exist or its data is DEFAULT.
 
         Returns:
@@ -73,60 +72,86 @@ class Start:
             username, password: if login info is not stored in db.json 
         """
         
-        fw.print_info("Parsing arguments", 2, "Username and password are stored localy so no need to enter them every time nor worry about them being stolen.")
+        fw.info("Parsing arguments", 2, "Username and password are stored localy so no need to enter them every time nor worry about them being stolen.")
         parser = argparse.ArgumentParser(description='Start program')
         parser.add_argument('-m', '--manual', action='store_true', help='Setup program manually (needs no other args)')
         parser.add_argument('-s', '--setup', action='store_true', help='Setup program')
         parser.add_argument('-u', '--username', type=str, help='Username for login')
         parser.add_argument('-p', '--password', type=str, help='Password for login')
+        
         args = parser.parse_args()
-        fw.print_info("Checking if db.json exists and its data is not DEFAULT", 2, "If it does not exist it will be created with default structure.")
+        fw.info("Checking if db.json exists and its data is not DEFAULT", 2, "If it does not exist it will be created with default structure.")
                     
         return args
-    
+    # add function to test login with username and password
+
+class start:
+    def __init__(self) -> None:
+        pass
+
     def Exe(self):
         """Executes setup of program
 
         Args:
             args (argparse.Namespace): arguments from Args function
         """
-        args = self.Args()
+        args = Start_helper.Args()
         
         if args.setup:
             if not args.username or  not args.password:
-                fw.print_info("Username or password not provided", 2)
-                fw.print_info("Program setup aborted", 2, "Error: incorrect arguments")
+                fw.info("Username or password not provided", 2)
+                fw.info("Program setup aborted", 2, "Error: incorrect arguments")
                 exit()
                 
         if args.setup:
-            fw.print_info("Setting up program", 2)
+            fw.info("Setting up program", 2)
             setup = Setup()
-            if self.Chek():
-                fw.print_info("db.json exists/was created and data is not DEFAULT", 2)
+            if Start_helper.Chek():
+                fw.info("db.json exists/was created and data is not DEFAULT", 2)
                 rst = fw.get_info("Would you wish to reset login info? [y/n]")
                 if rst == 'y':
                     js = ParseJson('db.json')
-                    self.Reset_login_info(js, args.username, args.password)
-                    fw.print_info("Login info reseted", 2)
+                    Start_helper.Reset_login_info(js, args.username, args.password)
+                    fw.info("Login info reseted", 2)
                 else:
                     return None
             else:
-                fw.print_info("db.json does not exist", 2)
-                fw.print_info("Creating db.json", 2)
+                fw.info("db.json does not exist", 2)
+                fw.info("Creating db.json", 2)
                 setup.create_file()
                 try:
                     js = ParseJson('db.json')
-                    js.write_login_info(args.username, args.password)
-                    fw.print_info("Login info stored", 2)
-                    raise SetupFailed("File could not be created")
+                    try:
+                        js.write_login_info(args.username, args.password)
+                        fw.info("Login info stored", 2)
+                    except Exception as e:
+                        fw.info(e, 2, "Raising exception")
+                        raise SetupFailed("File could not be created")
                 except SetupFailed as e:
-                    fw.print_info(e, 2, "Exiting program")
+                    fw.info(e, 2, "Exiting program")
                     exit()
-            fw.print_info("Program setup complete", 2)
+            fw.info("Program setup complete", 2)
         elif args.manual:
-            fw.print_info("Manual setup selected...exiting setup sript", 2)
-            return 
+            fw.info("Manual setup selected...exiting setup sript", 2, "Test login with username and password") 
         else:
-            fw.print_info("Program setup aborted", 2, "Error: incorrect arguments")
-            
-# add function to test login with username and password
+            fw.info("Program setup aborted", 2, "Error: incorrect arguments")
+        username, password = ParseJson('db.json').read_login_info()
+        fw.info("Attempting to login", 2, f"Using [{username}] as username and [{password}] as password")
+        success = self.attempt_login()
+
+        if success:
+            fw.info("Login successful", 2)
+        else:
+            fw.info("Login failed", 2)
+            exit()
+
+    def attempt_login(self)->None:
+        """Attempts to login with username and password
+
+        Returns:
+            Modified json file with success status
+        """
+        import web
+
+        ws = web.Login()
+        return ws.login()        
