@@ -12,23 +12,39 @@ class ParseJson:
             password = login_info['password']
         return username, password
 
-    def write_json_naloga(self, id, name, description):
+
+    def write_login_info(self, username, password):
         data = self._load_data()
-        data.setdefault('naloge', []).append({
-            'id': id,
-            'name': name,
-            'description': description
-        })
+        data['login_info']['username'] = username
+        data['login_info']['password'] = password
+        self._write_data(data)
+    
+    def write_json(self, cont_name:str, id:int, name:str, description:str):
+        data = self._load_data()
+        
+        try:    
+            data.setdefault(cont_name, []).append({
+                'id': id,
+                'name': name,
+                'description': description
+            })
+            if not isinstance(cont_name, str):
+                raise TypeError("cont_name must be a string but is {}".format(type(cont_name)))
+        
+        except TypeError as e:
+            print(e)
+            exit()
+
         self._write_data(data)
 
-    def write_json_vaje(self, id, name, description):
-        data = self._load_data()
-        data.setdefault('vaje', []).append({
-            'id': id,
-            'name': name,
-            'description': description
-        })
-        self._write_data(data)
+    # def write_json_vaje(self, id, name, description):
+    #     data = self._load_data()
+    #     data.setdefault('vaje', []).append({
+    #         'id': id,
+    #         'name': name,
+    #         'description': description
+    #     })
+    #     self._write_data(data)
 
     def _load_data(self):
         with open(self.filename, 'r') as file:
@@ -48,27 +64,6 @@ class LoginFailed(Exception):
     # Class used for raising an exception when login fails
     pass
 
-
-class StartSetup:
-    def __init__(self, filename='db.json'):
-        self.filename = filename
-        self.default_data = {
-            "login_info": {
-                "username": "",
-                "password": ""
-            },
-            "naloge": [],
-            "vaje": []
-        }
-    
-    def create_file(self):
-        if not os.path.exists(self.filename):
-            with open(self.filename, 'w') as file:
-                json.dump(self.default_data, file, indent=4)
-            print(f"'{self.filename}' created with default structure.")
-        else:
-            print(f"'{self.filename}' already exists.")
-
-    # Example
-    # setup = StartSetup()
-    # setup.create_file()
+class SetupFailed(Exception):
+    # Class used for raising an exception when setup fails
+    pass
