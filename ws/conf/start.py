@@ -114,6 +114,7 @@ class start:
                     Start_helper.Reset_login_info(js, args.username, args.password)
                     fw.info("Login info reseted", 2)
                 else:
+                    fw.info("If you wish to run the script user -m/--manual argument", 2)
                     return None
             else:
                 fw.info("db.json does not exist", 2)

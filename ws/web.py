@@ -53,8 +53,6 @@ class Login:
             fw.info(fw.explain_status_code(response.status_code),1)
         finally:
             if response.url != self.login_url:
-                fw.info("Login successful", 2)
                 return True
             else:
-                fw.info("Login failed", 2, "Exiting program")
                 return False
