@@ -1,4 +1,3 @@
-# write a functionm that cheks for existantc of db.json file and if it does not exist creat it
 import json
 import os
 from classes import ParseJson, SetupFailed
@@ -15,7 +14,7 @@ class Setup:
             "login_info": {
                 "username": "",
                 "password": "",
-                "success": False
+                "success": "False"
             },
             "naloge": [],
             "vaje": []
@@ -129,3 +128,5 @@ class Start:
             return 
         else:
             fw.print_info("Program setup aborted", 2, "Error: incorrect arguments")
+            
+# add function to test login with username and password
