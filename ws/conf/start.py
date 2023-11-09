@@ -16,6 +16,7 @@ class Setup:
                 "password": "",
                 "success": "False"
             },
+            "urls":[],
             "naloge": [],
             "vaje": []
         }
