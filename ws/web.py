@@ -16,6 +16,7 @@ class Login:
         self.session = requests.Session()
         self.username, self.password = js.read_login_info()
         self.login_url = 'https://ucilnica.fmf.uni-lj.si/login/index.php'
+
     def login(self)->bool:
         """Attempts to log in to the website
 
@@ -53,6 +54,49 @@ class Login:
             fw.info(fw.explain_status_code(response.status_code),1)
         finally:
             if response.url != self.login_url:
-                return True
+                self.get_class_ids()
             else:
+                return False
+
+
+    def get_class_ids(self) -> list:
+        """Gets all the class ids from the website
+
+        Returns:
+            list: list of class ids
+        """
+        fw.info("Getting class ids", 0)
+        response = self.session.get('https://ucilnica.fmf.uni-lj.si/')
+
+        # checks if get request was successful and returns list of class ids
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            course_elements = soup.find_all('a', class_='aalink')
+            class_ids = [element['href'].split('=')[1] for element in course_elements if 'course' in element['href']]
+            self.verify_id(class_ids)
+            return class_ids
+        else:
+            fw.error(f"Failed to retrieve content, status code: {response.status_code}")
+            return []
+
+    def verify_id(self, id:list)->bool:
+        """Checks if id is valid
+
+        Args:
+            id (list): list of class ids
+
+        Returns:
+            bool: True if id is valid, False otherwise
+        """
+        fw.info("Verifying class urls", 0)
+        js = ParseJson('db.json')
+        for i in id:
+            url = f'https://ucilnica.fmf.uni-lj.si/course/view.php?id={i}'
+            response = self.session.get(url)
+            if response.status_code == 200:
+                fw.info(f"{i} is valid", 1)
+                name = BeautifulSoup(response.text, 'html.parser').find('h1').text.strip()
+                js.write_url(name, {'valid_url': url})
+            else:
+                fw.error(f"{i} is invalid", 1)
                 return False
