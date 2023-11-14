@@ -1,4 +1,10 @@
-# fmf_webscraper
-webscraper for moodle website of Fakulteta za matematiko in fiziko
+# ul_webscraper
+web scraper for Moodle website for some Univerze v Ljubljani (any university site that uses Moodle for their sites (Tested for FMF, FRI)
 
-For now it will be able to go through any class you are enroled in or is publicly available for any loged in preson, gather and count how many links with title "NALOGE" or "VAJE" there are
+Currently supports login for any Moodle website with your credentials... that's probably it...
+<br>
+Current features:
+<br>- after success followup
+<br>- custom bach script to be able to rerun main.py
+<br>- login to moodle 
+<br><br>Mate to :)
