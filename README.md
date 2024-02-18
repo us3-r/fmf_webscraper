@@ -1,5 +1,5 @@
 # ul_webscraper
-web scraper for Moodle website for some Univerze v Ljubljani (it should work for any site that built with Moodel (Tested for FMF, FRI)).
+web scraper for Moodle website for some Univerze v Ljubljani (it should work for any site thats built with Moodel (Tested for FMF, FRI)).
 
 Currently supports login into a website with your credentials...and some other stuff
 <br>
